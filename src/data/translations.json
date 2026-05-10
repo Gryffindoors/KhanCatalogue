@@ -1,0 +1,122 @@
+{
+  "en": {
+    "nav": {
+      "home": "Home",
+      "catalogue": "Catalogue",
+      "branches": "Branches",
+      "contact": "Contact"
+    },
+    "catalogue": {
+      "title": "Product Catalogue",
+      "subtitle": "Browse our latest products",
+      "empty": "No products available"
+    },
+    "categories": {
+      "all": "All",
+      "laptop": "Laptops",
+      "desktop": "Desktops",
+      "monitor": "Monitors",
+      "custom": "Custom PCs",
+      "accessories": "Accessories"
+    },
+    "filters": {
+      "title": "Filters",
+      "brand": "Brand",
+      "price": "Price",
+      "availability": "Availability",
+      "reset": "Reset Filters"
+    },
+    "product": {
+      "details": "Product Details",
+      "specs": "Specifications",
+      "description": "Description",
+      "price": "Price",
+      "lastUpdated": "Last updated",
+      "noImage": "No Image Available"
+    },
+    "actions": {
+      "order": "Order / Enquire",
+      "nearestBranch": "Nearest Branch",
+      "contact": "Contact Us"
+    },
+    "branches": {
+      "title": "Our Branches",
+      "subtitle": "Find the nearest branch to you"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "subtitle": "Get in touch with us"
+    },
+    "placeholders": {
+      "search": "Search products...",
+      "selectCategory": "Select category",
+      "noResults": "No results found"
+    },
+    "notes": {
+      "newWarranty": "All products are brand new and come with warranty.",
+      "priceValidity": "Price is guaranteed for 24 hours from the time of order.",
+      "cashPolicy": "Cash prices apply to cash transactions only. For installment options, please contact us.",
+      "branchSelection": "Please select the nearest branch to receive your product. For shipping, full payment in advance is required."
+    }
+  },
+  "ar": {
+    "nav": {
+      "home": "الرئيسية",
+      "catalogue": "المنتجات",
+      "branches": "الفروع",
+      "contact": "تواصل معنا"
+    },
+    "catalogue": {
+      "title": "كتالوج المنتجات",
+      "subtitle": "تصفح أحدث المنتجات",
+      "empty": "لا توجد منتجات حالياً"
+    },
+    "categories": {
+      "all": "الكل",
+      "laptop": "لابتوب",
+      "desktop": "كمبيوتر",
+      "monitor": "شاشات",
+      "custom": "تجميعات",
+      "accessories": "إكسسوارات"
+    },
+    "filters": {
+      "title": "التصفية",
+      "brand": "الشركة",
+      "price": "السعر",
+      "availability": "التوفر",
+      "reset": "إعادة التصفية"
+    },
+    "product": {
+      "details": "تفاصيل المنتج",
+      "specs": "المواصفات",
+      "description": "الوصف",
+      "price": "السعر",
+      "lastUpdated": "آخر تحديث",
+      "noImage": "لا توجد صورة"
+    },
+    "actions": {
+      "order": "اطلب / استفسر",
+      "nearestBranch": "أقرب فرع",
+      "contact": "تواصل معنا"
+    },
+    "branches": {
+      "title": "فروعنا",
+      "subtitle": "اعثر على أقرب فرع لك"
+    },
+    "contact": {
+      "title": "تواصل معنا",
+      "subtitle": "يسعدنا تواصلك معنا"
+    },
+    "placeholders": {
+      "search": "ابحث عن منتج...",
+      "selectCategory": "اختر القسم",
+      "noResults": "لا توجد نتائج"
+    },
+    "notes": {
+      "newWarranty": "جميع المنتجات جديدة وتأتي بضمان.",
+      "priceValidity": "السعر ساري لمدة 24 ساعة فقط من وقت الطلب.",
+      "cashPolicy": "الأسعار المعلنة نقدي فقط. للتقسيط يرجى التواصل معنا.",
+      "branchSelection": "يرجى اختيار أقرب فرع لاستلام المنتج. في حالة الشحن يجب الدفع مقدماً."
+    }
+  }
+}

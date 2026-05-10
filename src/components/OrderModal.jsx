@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { APP_CONFIG } from "../config/appConfig";
+import { APP_CONFIG } from "../config/appconfig";
 import { BRANCHES } from "../data/branches";
 import { useUI } from "../context/UIContext";
 import { buildOrderMessage, buildWhatsAppUrl } from "../utils/orderMessage";

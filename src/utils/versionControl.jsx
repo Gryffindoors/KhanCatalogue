@@ -1,4 +1,4 @@
-import { APP_CONFIG } from "../config/appconfig";
+import { APP_CONFIG } from "../config/appConfig";
 
 const STORAGE_KEYS = {
   uiVersion: "catalogue_ui_version",

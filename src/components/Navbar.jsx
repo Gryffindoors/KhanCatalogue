@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { useState } from "react";
-import { APP_CONFIG } from "../config/appconfig";
+import { APP_CONFIG } from "../config/appConfig";
 import { useUI } from "../context/UIContext";
 import BranchListModal from "./BranchListModal";
 import logo from "../images/3-01-01.jpg";

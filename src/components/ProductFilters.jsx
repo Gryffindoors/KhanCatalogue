@@ -4,14 +4,19 @@ import { useUI } from "../context/UIContext";
 const PRICE_MIN_TOLERANCE = 0.95;
 const PRICE_MAX_TOLERANCE = 1.05;
 
+/**
+ * Standardizes Arabic/Persian digits to Western (0-9)
+ */
 function normalizeDigits(value) {
   if (value === null || value === undefined) return "";
-
   return String(value)
     .replace(/[٠-٩]/g, (digit) => "٠١٢٣٤٥٦٧٨٩".indexOf(digit))
-    .replace(/[۰-۹]/g, (digit) => "۰۱۲۳۴۵۶۷۸۹".indexOf(digit));
+    .replace(/[۰-۹]/g, (digit) => "۰۱۲۳۴٥٦٧٨٩".indexOf(digit));
 }
 
+/**
+ * Prepares text for comparison: lowcase, trimmed, and normalized digits
+ */
 function normalizeText(value) {
   return normalizeDigits(value)
     .toLowerCase()
@@ -19,107 +24,130 @@ function normalizeText(value) {
     .replace(/\s+/g, " ");
 }
 
+/**
+ * Robust Egyptian price parser: handles thousands separators (dots/commas) 
+ */
 function parsePriceInput(value) {
-  const normalized = normalizeDigits(value)
-    .trim()
-    .replace(/,/g, "");
-
+  const normalized = normalizeDigits(value).trim().replace(/,/g, "");
   if (!normalized) return null;
 
-  /*
-    Handles common Egyptian price writing:
-    9999
-    9,999
-    9.999  => treated as 9999
-    10000
-  */
   const thousandsDotPattern = /^\d{1,3}(\.\d{3})+$/;
-
   const cleaned = thousandsDotPattern.test(normalized)
     ? normalized.replace(/\./g, "")
     : normalized;
 
   const number = Number(cleaned);
-
   return Number.isFinite(number) ? number : null;
 }
 
-function matchesSearch(product, searchTerm) {
-  const normalizedSearch = normalizeText(searchTerm);
-
-  if (!normalizedSearch) return true;
-
-  const searchWords = normalizedSearch.split(" ").filter(Boolean);
-
-  const searchableText = normalizeText(
-    [
-      product.id,
-      product.name,
-      product.brand,
-      product.category,
-      product.price,
-    ].join(" ")
-  );
-
-  return searchWords.every((word) => searchableText.includes(word));
-}
-
-function getUniqueOptions(products, key) {
-  return Array.from(
-    new Set(
-      products
-        .map((product) => product[key])
-        .filter(Boolean)
-        .map((value) => String(value).trim())
-        .filter(Boolean)
-    )
-  ).sort((a, b) => a.localeCompare(b));
-}
-
+/**
+ * ProductFilters: Optimized for performance with large datasets
+ * Includes debouncing and multi-language support (AR/EN)
+ */
 export default function ProductFilters({ products = [], onResultsChange }) {
   const { t, language } = useUI();
-  const [isExpanded, setIsExpanded] = useState(false); // Collapsible State
+  const [isExpanded, setIsExpanded] = useState(false);
 
+  // Core Filter State
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedBrand, setSelectedBrand] = useState("all");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
-  const categoryOptions = useMemo(() => getUniqueOptions(products, "category"), [products]);
-  const brandOptions = useMemo(() => getUniqueOptions(products, "brand"), [products]);
+  const isArabic = language === "ar";
 
+  // Debounce search term to prevent re-calculating on every single keystroke
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 250);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
+
+  // Extract unique options for dropdowns
+  const categoryOptions = useMemo(() => 
+    Array.from(new Set(products.map((p) => p.category).filter(Boolean))).sort(),
+    [products]
+  );
+
+  const brandOptions = useMemo(() => 
+    Array.from(new Set(products.map((p) => p.brand).filter(Boolean))).sort(),
+    [products]
+  );
+
+  // Optimized Filter logic: Exit early on fast checks before doing expensive string searching
   const filteredProducts = useMemo(() => {
-    const parsedMinPrice = parsePriceInput(minPrice);
-    const parsedMaxPrice = parsePriceInput(maxPrice);
-    const effectiveMinPrice = parsedMinPrice === null ? null : parsedMinPrice * PRICE_MIN_TOLERANCE;
-    const effectiveMaxPrice = parsedMaxPrice === null ? null : parsedMaxPrice * PRICE_MAX_TOLERANCE;
+    const searchWords = normalizeText(debouncedSearch).split(" ").filter(Boolean);
+    const parsedMin = parsePriceInput(minPrice);
+    const parsedMax = parsePriceInput(maxPrice);
+    
+    const effMin = parsedMin === null ? null : parsedMin * PRICE_MIN_TOLERANCE;
+    const effMax = parsedMax === null ? null : parsedMax * PRICE_MAX_TOLERANCE;
 
     return products.filter((product) => {
-      const productPrice = Number(product.price || 0);
-      return (
-        matchesSearch(product, searchTerm) &&
-        (selectedCategory === "all" || product.category === selectedCategory) &&
-        (selectedBrand === "all" || product.brand === selectedBrand) &&
-        (effectiveMinPrice === null || productPrice >= effectiveMinPrice) &&
-        (effectiveMaxPrice === null || productPrice <= effectiveMaxPrice)
-      );
-    });
-  }, [products, searchTerm, selectedCategory, selectedBrand, minPrice, maxPrice]);
+      // 1. Category/Brand checks (Fastest)
+      if (selectedCategory !== "all" && product.category !== selectedCategory) return false;
+      if (selectedBrand !== "all" && product.brand !== selectedBrand) return false;
 
-  useEffect(() => { onResultsChange(filteredProducts); }, [filteredProducts, onResultsChange]);
+      // 2. Price Boundary checks
+      const pPrice = Number(product.price || 0);
+      if (effMin !== null && pPrice < effMin) return false;
+      if (effMax !== null && pPrice > effMax) return false;
+
+      // 3. Search Matching (Expensive String Ops)
+      if (searchWords.length > 0) {
+        const searchableText = normalizeText(
+          `${product.id || ""} ${product.name || ""} ${product.brand || ""} ${product.category || ""}`
+        );
+        if (!searchWords.every((word) => searchableText.includes(word))) return false;
+      }
+
+      return true;
+    });
+  }, [products, debouncedSearch, selectedCategory, selectedBrand, minPrice, maxPrice]);
+
+  // Update parent only when the calculated result changes
+  useEffect(() => {
+    onResultsChange(filteredProducts);
+  }, [filteredProducts, onResultsChange]);
 
   const resetFilters = () => {
-    setSearchTerm(""); setSelectedCategory("all"); setSelectedBrand("all"); setMinPrice(""); setMaxPrice("");
+    setSearchTerm("");
+    setSelectedCategory("all");
+    setSelectedBrand("all");
+    setMinPrice("");
+    setMaxPrice("");
   };
 
-  const isArabic = language === "ar";
+  const filterFields = [
+    { 
+      label: t.categories.all, 
+      val: selectedCategory, 
+      set: setSelectedCategory, 
+      opt: categoryOptions, 
+      def: t.categories.all 
+    },
+    { 
+      label: t.filters.brand, 
+      val: selectedBrand, 
+      set: setSelectedBrand, 
+      opt: brandOptions, 
+      def: isArabic ? "كل الشركات" : "All Brands" 
+    }
+  ];
+
+  const priceFields = [
+    { label: isArabic ? "أقل سعر" : "Min", val: minPrice, set: setMinPrice },
+    { label: isArabic ? "أعلى سعر" : "Max", val: maxPrice, set: setMaxPrice }
+  ];
 
   return (
     <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_0_50px_-12px_rgba(59,130,246,0.15)] transition-all duration-500">
-      <div className="absolute top-0 left-0 h-0.5 w-full bg-linear-to-r from-transparent via-blue-600 to-transparent opacity-50" />
+      <div className="absolute top-0 left-0 h-0.5 w-full bg-gradient-to-r from-transparent via-blue-600 to-transparent opacity-50" />
 
-      {/* MOBILE TRIGGER BAR: Always visible on mobile, hidden on lg desktop if you prefer */}
+      {/* Mobile Toggle Bar */}
       <div className="flex items-center justify-between p-4 lg:hidden">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
@@ -138,13 +166,12 @@ export default function ProductFilters({ products = [], onResultsChange }) {
         </button>
       </div>
 
-      {/* COLLAPSIBLE CONTENT */}
-      <div
-        className={`transition-all duration-500 ease-in-out ${isExpanded ? 'max-h-250 opacity-100' : 'max-h-0 opacity-0 lg:max-h-250 lg:opacity-100'} overflow-hidden`}
-      >
+      {/* Main Content */}
+      <div className={`transition-all duration-500 ease-in-out ${isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0 lg:max-h-[1000px] lg:opacity-100'} overflow-hidden`}>
         <div className="p-6 pt-0 lg:pt-6">
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-6">
-            {/* Search Field */}
+            
+            {/* Unified Search Field */}
             <div className="md:col-span-2 lg:col-span-2">
               <label className="mb-2 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-blue-500/80">
                 <span className="h-1 w-3 rounded-full bg-blue-600 animate-pulse" />
@@ -153,17 +180,14 @@ export default function ProductFilters({ products = [], onResultsChange }) {
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(normalizeDigits(e.target.value))}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={t.placeholders.search}
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-blue-500 focus:bg-black focus:ring-1 focus:ring-blue-500/50 outline-none transition-all"
               />
             </div>
 
             {/* Dropdowns */}
-            {[
-              { label: t.categories.all, val: selectedCategory, set: setSelectedCategory, opt: categoryOptions, def: t.categories.all },
-              { label: t.filters.brand, val: selectedBrand, set: setSelectedBrand, opt: brandOptions, def: isArabic ? "كل الشركات" : "All Brands" }
-            ].map((item, idx) => (
+            {filterFields.map((item, idx) => (
               <div key={idx}>
                 <label className="mb-2 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500">
                   {item.label}
@@ -184,12 +208,9 @@ export default function ProductFilters({ products = [], onResultsChange }) {
               </div>
             ))}
 
-            {/* Price Inputs */}
+            {/* Numeric Price Range */}
             <div className="grid grid-cols-2 gap-3 lg:col-span-2">
-              {[
-                { label: isArabic ? "أقل سعر" : "Min", val: minPrice, set: setMinPrice },
-                { label: isArabic ? "أعلى سعر" : "Max", val: maxPrice, set: setMaxPrice }
-              ].map((price, idx) => (
+              {priceFields.map((price, idx) => (
                 <div key={idx}>
                   <label className="mb-2 text-[11px] font-black uppercase tracking-[0.2em] text-zinc-500 block">
                     {price.label}
@@ -199,7 +220,7 @@ export default function ProductFilters({ products = [], onResultsChange }) {
                       type="text"
                       inputMode="numeric"
                       value={price.val}
-                      onChange={(e) => price.set(normalizeDigits(e.target.value))}
+                      onChange={(e) => price.set(e.target.value)}
                       placeholder="0.00"
                       className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-3 font-mono text-sm text-blue-400 placeholder:text-zinc-800 focus:border-blue-500 focus:bg-black outline-none transition-all"
                     />
@@ -210,24 +231,22 @@ export default function ProductFilters({ products = [], onResultsChange }) {
             </div>
           </div>
 
-          {/* Footer Details */}
+          {/* Footer Controls */}
           <div className="mt-8 flex items-center justify-between border-t border-white/5 pt-5">
-            <div className="flex items-center gap-6">
-              <div className="flex flex-col">
-                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">System Status</span>
-                <div className="flex items-center gap-2">
-                  <span className="flex h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
-                  <p className="text-xs font-mono font-bold text-zinc-200">
-                    {isArabic ? "نتائج:" : "ITEMS FOUND:"} <span className="text-blue-500">{filteredProducts.length}</span>
-                  </p>
-                </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Inventory Sync</span>
+              <div className="flex items-center gap-2">
+                <span className="flex h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+                <p className="text-xs font-mono font-bold text-zinc-200 uppercase">
+                  {isArabic ? "نتائج:" : "Items Found:"} <span className="text-blue-500">{filteredProducts.length}</span>
+                </p>
               </div>
             </div>
 
             <button
               type="button"
               onClick={resetFilters}
-              className="group relative flex items-center gap-2 overflow-hidden rounded-lg bg-white px-5 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] text-black transition-all hover:ring-2 hover:ring-white/20 active:scale-95"
+              className="group relative flex items-center gap-2 overflow-hidden rounded-lg bg-white px-5 py-2.5 text-[11px] font-black uppercase tracking-[0.15em] text-black transition-all hover:bg-zinc-200 active:scale-95"
             >
               <span className="relative z-10">{t.filters.reset}</span>
               <span className="relative z-10 transition-transform duration-500 group-hover:rotate-180">↺</span>

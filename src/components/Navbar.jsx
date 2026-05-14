@@ -3,14 +3,15 @@ import { useState } from "react";
 import { APP_CONFIG } from "../config/appconfig";
 import { useUI } from "../context/UIContext";
 import BranchListModal from "./BranchListModal";
+import PaymentMethodsModal from "./InstallmanentsModal"; // New Import
 import logo from "../images/3-01-01.jpg";
 
 export default function Navbar() {
   const { t, language, toggleLanguage } = useUI();
   const [isBranchModalOpen, setIsBranchModalOpen] = useState(false);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false); // New State
 
   const isArabic = language === "ar";
-
   const whatsappUrl = `https://wa.me/${APP_CONFIG.WHATSAPP_PHONE}`;
 
   return (
@@ -20,18 +21,12 @@ export default function Navbar() {
 
           {/* Logo & Brand Section */}
           <Link to="/" className="flex items-center gap-3 group">
-            {/* 
-                LOGO CONTAINER: 
-                Removed the 'p-1' white box. 
-                Using a 'dark hardware' frame with a subtle outer glow 
-            */}
             <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-zinc-900 ring-1 ring-white/10 group-hover:ring-blue-500/50 transition-all duration-300">
               <img
                 src={logo}
                 alt={APP_CONFIG.COMPANY_NAME}
                 className="h-full w-full object-cover mix-blend-lighten opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-transform"
               />
-              {/* Subtle glass overlay for tech texture */}
               <div className="absolute inset-0 bg-linear-to-tr from-blue-500/10 to-transparent pointer-events-none" />
             </div>
 
@@ -54,6 +49,15 @@ export default function Navbar() {
               {t.nav.catalogue}
             </Link>
 
+            {/* Payment Methods Button */}
+            <button
+              type="button"
+              onClick={() => setIsPaymentModalOpen(true)}
+              className="rounded-md px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400 transition hover:bg-white/5 hover:text-blue-400"
+            >
+              {t.nav.payment}
+            </button>
+
             <button
               type="button"
               onClick={() => setIsBranchModalOpen(true)}
@@ -73,10 +77,10 @@ export default function Navbar() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              {t.nav.contact}
+              <span className="hidden xs:inline">{t.nav.contact}</span>
             </a>
 
-            {/* Language Switcher: Stylized as a Toggle Switch */}
+            {/* Language Switcher */}
             <button
               type="button"
               onClick={toggleLanguage}
@@ -90,9 +94,15 @@ export default function Navbar() {
         </div>
       </header>
 
+      {/* Modals */}
       <BranchListModal
         isOpen={isBranchModalOpen}
         onClose={() => setIsBranchModalOpen(false)}
+      />
+
+      <PaymentMethodsModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
       />
     </>
   );

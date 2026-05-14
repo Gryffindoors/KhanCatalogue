@@ -4,7 +4,8 @@
       "home": "Home",
       "catalogue": "Catalogue",
       "branches": "Branches",
-      "contact": "Contact"
+      "contact": "Contact",
+      "payment": "Payment Methods"
     },
     "catalogue": {
       "title": "Product Catalogue",
@@ -59,14 +60,31 @@
       "priceValidity": "Price is guaranteed for 24 hours from the time of order.",
       "cashPolicy": "Cash prices apply to cash transactions only. For installment options, please contact us.",
       "branchSelection": "Please select the nearest branch to receive your product. For shipping, full payment in advance is required."
-    }
+    },
+    "payment": {
+    "title": "Payment Methods",
+    "subtitle": "Secure Transaction Protocol",
+    "cash_title": "Cash at Branch",
+    "cash_desc": "Cash on delivery at branch (For bookings > 24hrs, 25% deposit required via transfer).",
+    "visa_title": "Visa / Mastercard",
+    "visa_desc": "Payment via Visa (Subject to 2% bank processing fee).",
+    "delivery_title": "Home Delivery",
+    "delivery_desc": "For delivery orders, full amount + shipping fees must be paid in advance.",
+    "bank_accounts_title": "Bank Transfer Details",
+    "instapay_title": "InstaPay",
+    "loading": "Fetching Payment Nodes...",
+    "companies_title": "Financing Companies",
+    "banks_title": "Bank Installments",
+    "conditions_title": "Terms & Conditions"
+  }
   },
   "ar": {
     "nav": {
       "home": "الرئيسية",
       "catalogue": "المنتجات",
       "branches": "الفروع",
-      "contact": "تواصل معنا"
+      "contact": "تواصل معنا",
+      "payment": "طرق الدفع"
     },
     "catalogue": {
       "title": "كتالوج المنتجات",
@@ -121,6 +139,22 @@
       "priceValidity": "السعر ساري لمدة 24 ساعة فقط من وقت الطلب.",
       "cashPolicy": "الأسعار المعلنة نقدي فقط. للتقسيط يرجى التواصل معنا.",
       "branchSelection": "يرجى اختيار أقرب فرع لاستلام المنتج. في حالة الشحن يجب الدفع مقدماً."
+    },
+    "payment": {
+      "title": "وسائل الدفع",
+      "subtitle": "بروتوكول الدفع الآمن",
+      "cash_title": "دفع نقدى عند الاستلام",
+      "cash_desc": "الاستلام من الفرع (فى حالة الحجز لمدة اكثر من 24 ساعة يتم دفع 25% عن طريق التحويل النقدى بصفة عربون).",
+      "visa_title": "دفع عن طريق الفيزا",
+      "visa_desc": "يتم خصم 2% عمولة سحب خاصة بالبنك.",
+      "delivery_title": "فى حالة طلب التوصيل",
+      "delivery_desc": "يتم دفع المبلغ بالكامل + قيمة الشحن اولاً.",
+      "bank_accounts_title": "الحسابات البنكية للتحويل:",
+      "instapay_title": "انستاباى",
+      "loading": "جاري تحميل بيانات الدفع...",
+      "companies_title": "شركات التمويل",
+      "banks_title": "تقسيط البنوك",
+      "conditions_title": "شروط وأحكام الدفع"
     }
   }
 }

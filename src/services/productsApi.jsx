@@ -42,3 +42,9 @@ export async function getProductById(id) {
 
   return normalizeProductDetails(data);
 }
+
+// Add to your API file
+export async function getInstallmentPartners() {
+  const url = `${API_CONFIG.CATALOGUE_BASE_URL}?type=installments`;
+  return await fetchJson(url);
+}

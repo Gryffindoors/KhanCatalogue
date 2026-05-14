@@ -1,6 +1,6 @@
 export const APP_CONFIG = {
   UI_VERSION: "1.3.5",
-  COMPANY_NAME: "El-Khan",
+  COMPANY_NAME: "El-Khan", 
   TEST_VALUE: "CONFIG_IS_UPDATED",
   WHATSAPP_PHONE: "201003587003",
 };

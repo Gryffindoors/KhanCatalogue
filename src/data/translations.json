@@ -37,7 +37,9 @@
     "actions": {
       "order": "Order / Enquire",
       "nearestBranch": "Nearest Branch",
-      "contact": "Contact Us"
+      "contact": "Contact Us",
+      "sendWhatsApp": "Order By Whatsapp",
+      "terminateSession": "Cancel"
     },
     "branches": {
       "title": "Our Branches",
@@ -97,7 +99,9 @@
     "actions": {
       "order": "اطلب / استفسر",
       "nearestBranch": "أقرب فرع",
-      "contact": "تواصل معنا"
+      "contact": "تواصل معنا",
+      "sendWhatsApp": "إرسال عبر واتساب",
+      "terminateSession": "إلغاء"
     },
     "branches": {
       "title": "فروعنا",

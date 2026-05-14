@@ -6,7 +6,7 @@ import { useUI } from "../context/UIContext";
 import { buildOrderMessage, buildWhatsAppUrl } from "../utils/orderMessage";
 
 function normalizeDigits(value) {
-  return String(value || "").replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g, (d) => "۰۱۲۳۴۵六七八九".indexOf(d));
+  return String(value || "").replace(/[٠-٩]/g, (d) => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g, (d) => "۰۱۲۳۴五六七八九".indexOf(d));
 }
 
 export default function OrderModal({ product, isOpen, onClose }) {
@@ -48,26 +48,45 @@ export default function OrderModal({ product, isOpen, onClose }) {
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  /* 
+    Full edited function including:
+    1. Click-outside listener on the backdrop div
+    2. Distinct close button with border and bg-hover
+    3. Responsive max-width/max-height at 90% for mobile
+  */
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-sm p-3 sm:items-center">
-      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 shadow-[0_0_50px_rgba(0,0,0,1)] animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      onClick={onClose} // Closes when clicking the backdrop
+    >
+      <div 
+        className="relative w-full max-w-lg max-h-[90vh] md:max-h-none overflow-y-auto md:overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 shadow-[0_0_50px_rgba(0,0,0,1)] animate-in fade-in zoom-in-95 duration-300 flex flex-col"
+        style={{ maxWidth: '90%', maxHeight: '90%' }} // Strict 90% constraint for mobile
+        onClick={(e) => e.stopPropagation()} // Prevents closing when clicking inside the modal
+      >
         
         {/* Header: Tech Terminal Style */}
-        <div className="flex items-center justify-between border-b border-white/5 bg-zinc-900/50 p-4">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/5 bg-zinc-900/80 backdrop-blur-md p-4">
           <div className="flex items-center gap-3">
             <span className="h-2 w-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,1)]" />
             <h2 className="font-mono text-xs font-black uppercase tracking-[0.2em] text-zinc-100">
               {t.actions.order} 
             </h2>
           </div>
-          <button onClick={onClose} className="group p-1 text-zinc-500 hover:text-white transition-colors">
+          
+          {/* Distinct Close Button */}
+          <button 
+            onClick={onClose} 
+            className="group flex items-center justify-center h-8 w-8 rounded-lg border border-white/10 bg-white/5 text-zinc-400 hover:bg-red-500/20 hover:text-red-500 hover:border-red-500/50 transition-all"
+            aria-label="Close"
+          >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-5">
+        <form onSubmit={handleSubmit} className="p-5 overflow-y-auto">
           {/* Product Summary Block */}
           <div className="mb-6 rounded-lg border border-zinc-800 bg-black/40 p-4 ring-1 ring-white/5">
             <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Target_Component</p>
@@ -81,7 +100,6 @@ export default function OrderModal({ product, isOpen, onClose }) {
           </div>
 
           <div className="space-y-4">
-            {/* Input Groups */}
             {[
               { label: isArabic ? "اسم العميل" : "Customer Name", val: customerName, set: setCustomerName, type: "text", ph: isArabic ? "اكتب الاسم الكامل" : "ENTER FULL NAME" },
               { label: isArabic ? "رقم الهاتف" : "Phone Number", val: customerPhone, set: setCustomerPhone, type: "tel", ph: "01XXXXXXXXX" }
@@ -100,7 +118,6 @@ export default function OrderModal({ product, isOpen, onClose }) {
               </div>
             ))}
 
-            {/* Branch Selection */}
             <div>
               <label className="mb-1.5 block font-mono text-[10px] font-black uppercase tracking-widest text-zinc-500">
                 {t.actions.nearestBranch}
@@ -130,14 +147,13 @@ export default function OrderModal({ product, isOpen, onClose }) {
             </div>
           </div>
 
-          {/* Actions */}
           <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <button
               type="submit"
               className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 text-[11px] font-black uppercase tracking-widest text-white transition-all hover:bg-blue-500 active:scale-95 shadow-[0_10px_20px_rgba(59,130,246,0.3)]"
             >
               <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.484 8.412 0 6.556-5.338 11.891-11.893 11.891-2.01 0-3.991-.511-5.753-1.48l-6.244 1.689zm5.889-4.707c1.569.932 3.12 1.396 4.67 1.397 5.011 0 9.088-4.077 9.091-9.088.001-2.427-.944-4.709-2.661-6.427-1.717-1.718-3.998-2.665-6.425-2.665-5.013 0-9.091 4.078-9.093 9.091 0 1.654.457 3.267 1.321 4.685l-1.012 3.693 3.799-1.006z"/></svg>
-              {isArabic ? "إرسال الطلب" : "SEND_ON_WHATSAPP"}
+              {t.actions.sendWhatsApp}
             </button>
 
             <button
@@ -145,7 +161,7 @@ export default function OrderModal({ product, isOpen, onClose }) {
               onClick={onClose}
               className="rounded-xl border border-zinc-800 bg-transparent py-4 text-[11px] font-black uppercase tracking-widest text-zinc-500 transition-all hover:border-zinc-700 hover:text-white"
             >
-              {isArabic ? "إلغاء" : "TERMINATE_SESSION"}
+              {t.actions.terminateSession}
             </button>
           </div>
         </form>

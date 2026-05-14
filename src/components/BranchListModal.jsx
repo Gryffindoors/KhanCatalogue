@@ -71,7 +71,7 @@ export default function BranchListModal({ isOpen, onClose }) {
                     <div className="flex items-center gap-2">
                        <span className="h-1 w-1 rounded-full bg-blue-500" />
                        <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
-                         {isArabic ? "ساعات العمل" : "Operation_Hours"}
+                         {isArabic ? "ساعات العمل" : "Operation   Hours"}
                        </p>
                     </div>
                     <p className="text-xs leading-relaxed text-zinc-400 rtl:text-right">
@@ -84,12 +84,12 @@ export default function BranchListModal({ isOpen, onClose }) {
           ))}
         </div>
         
-        {/* Modal Footer: System Footer */}
+        {/* Modal Footer: System Footer
         <div className="border-t border-white/5 bg-zinc-950 p-4 text-center">
            <p className="font-mono text-[8px] uppercase tracking-[0.5em] text-zinc-700">
              End_Of_Transmission 
            </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

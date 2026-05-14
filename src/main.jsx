@@ -8,11 +8,11 @@ import { UIProvider } from './context/UIContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <HashRouter>
+    <BrowserRouter>
       <UIProvider>
         <App />
         <Toaster position="top-center" />
       </UIProvider>
-    </HashRouter>
-  </StrictMode>,
+    </BrowserRouter>
+  </StrictMode>
 )

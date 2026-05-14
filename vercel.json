@@ -5,8 +5,12 @@
       "destination": "https://script.google.com/macros/s/AKfycbyK5CR7mzHpW_K-8QN-ZtfCnYJfcM1ZRlqKAy3gA8lRcs1GedqGvK65sKAmLStZPqDp/exec"
     },
     {
+      "source": "/product/:id",
+      "destination": "/index.html"
+    },
+    {
       "source": "/(.*)",
-      "destination": "/"
+      "destination": "/index.html"
     }
   ]
 }

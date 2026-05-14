@@ -23,15 +23,33 @@ export default function ProductDetailsPage() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const isArabic = language === "ar";
 
-  if (loading || !product) return <div className="min-h-screen bg-black" />; // Keep it clean during load
+  if (loading) {
+    return <div className="min-h-screen bg-black text-white p-10">Loading...</div>;
+  }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black text-red-500 p-10">
+        {error}
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-black text-white p-10">
+        Product not found
+      </div>
+    );
+  }
+  
   const description = product.description?.[language] || product.description?.en || "";
   const specs = product.specs?.[language] || product.specs?.en || [];
 
   return (
     <main className="min-h-screen bg-black px-4 py-6 md:px-8">
       <div className="mx-auto max-w-7xl">
-        
+
         {/* Navigation Breadcrumb */}
         <div className="mb-6">
           <Link to="/" className="group inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 hover:text-blue-500 transition-colors">
@@ -40,22 +58,22 @@ export default function ProductDetailsPage() {
         </div>
 
         <section className="grid gap-10 lg:grid-cols-[1fr_450px] xl:grid-cols-[1fr_500px]">
-          
+
           {/* Left Column: Visualizer */}
           <div className="space-y-6">
             <div className="relative aspect-video overflow-hidden rounded-2xl border border-white/5 bg-[#050505] flex items-center justify-center p-12">
               <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-              
+
               {images.length > 0 ? (
-                <img 
-                  src={images[activeImageIndex]} 
-                  alt={product.name} 
+                <img
+                  src={images[activeImageIndex]}
+                  alt={product.name}
                   className="relative z-10 max-h-full max-w-full object-contain"
                 />
               ) : (
                 <div className="flex flex-col items-center gap-4 opacity-20">
-                   <div className="h-20 w-20 rounded-full border border-dashed border-blue-500 animate-spin" style={{animationDuration: '20s'}} />
-                   <span className="font-mono text-[9px] uppercase tracking-widest text-blue-500">{t.product.noImage}</span>
+                  <div className="h-20 w-20 rounded-full border border-dashed border-blue-500 animate-spin" style={{ animationDuration: '20s' }} />
+                  <span className="font-mono text-[9px] uppercase tracking-widest text-blue-500">{t.product.noImage}</span>
                 </div>
               )}
             </div>
@@ -67,9 +85,8 @@ export default function ProductDetailsPage() {
                   <button
                     key={idx}
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`relative h-16 w-16 overflow-hidden rounded-lg border transition-all ${
-                      activeImageIndex === idx ? "border-blue-500 ring-2 ring-blue-500/20" : "border-zinc-800 bg-zinc-950 opacity-40 hover:opacity-100"
-                    }`}
+                    className={`relative h-16 w-16 overflow-hidden rounded-lg border transition-all ${activeImageIndex === idx ? "border-blue-500 ring-2 ring-blue-500/20" : "border-zinc-800 bg-zinc-950 opacity-40 hover:opacity-100"
+                      }`}
                   >
                     <img src={img} className="h-full w-full object-cover" />
                   </button>
@@ -96,7 +113,7 @@ export default function ProductDetailsPage() {
                 <span className="h-1 w-1 rounded-full bg-zinc-800" />
                 <span className="font-mono text-[9px] text-zinc-600 uppercase">REF_ID: {product.id}</span>
               </div>
-              
+
               {/* Name is now smaller and technical */}
               <h1 className="text-lg font-bold leading-tight text-white md:text-xl uppercase tracking-tight">
                 {product.name}
@@ -131,11 +148,11 @@ export default function ProductDetailsPage() {
               </button>
 
               <div className="rounded-xl border border-zinc-900 bg-zinc-950/50 p-5">
-                 <ul className="space-y-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500 leading-relaxed italic">
-                    <li>• {t.notes.newWarranty}</li>
-                    <li>• {t.notes.priceValidity}</li>
-                    <li>• {t.notes.cashPolicy}</li>
-                 </ul>
+                <ul className="space-y-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500 leading-relaxed italic">
+                  <li>• {t.notes.newWarranty}</li>
+                  <li>• {t.notes.priceValidity}</li>
+                  <li>• {t.notes.cashPolicy}</li>
+                </ul>
               </div>
             </div>
 

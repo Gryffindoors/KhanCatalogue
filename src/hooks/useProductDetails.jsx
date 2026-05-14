@@ -17,6 +17,7 @@ export function useProductDetails(id) {
 
       setProduct(data);
     } catch (err) {
+      setProduct(null);
       setError(err.message || "Failed to load product details");
     } finally {
       setLoading(false);

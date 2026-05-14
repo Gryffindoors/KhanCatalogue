@@ -60,7 +60,7 @@ export default function ProductDetailsPage() {
       <div className="mx-auto max-w-7xl">
         <div className="mb-6">
           <Link to="/" className="group inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 hover:text-blue-500 transition-colors">
-            {isArabic ? `CATALOGUE / ${product.category}` : `${product.category} / CATALOGUE`}
+            {isArabic ? `الرئيسية` : `Home Page`}
           </Link>
         </div>
 

@@ -12,6 +12,7 @@ export default function PaymentMethodsModal({ isOpen, onClose }) {
 
   useEffect(() => {
     if (isOpen) {
+      setIsLoading(true);
       getInstallmentPartners()
         .then((res) => {
           setInstallments(res);
@@ -29,26 +30,34 @@ export default function PaymentMethodsModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  const InstallmentGrid = ({ title, items, accentColor }) => (
-    <div className="space-y-3">
-      <h3 className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 px-1">
-        {title}
-      </h3>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {items.map((item, i) => (
-          <div key={i} className="flex items-center gap-2 rounded-lg border border-white/5 bg-zinc-900/50 p-3 transition-colors hover:border-zinc-700">
-            <div className={`h-1 w-1 rounded-full ${accentColor}`} />
-            <span className="text-[11px] font-bold text-zinc-300">{item}</span>
-          </div>
-        ))}
+  // Sub-component for rendering the grids
+  const InstallmentGrid = ({ title, items, accentColor }) => {
+    // Logic: Remove the first item from the array (index 0)
+    const filteredItems = items?.length > 1 ? items.slice(1) : [];
+
+    if (filteredItems.length === 0) return null;
+
+    return (
+      <div className="space-y-3">
+        <h3 className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 px-1">
+          {title}
+        </h3>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {filteredItems.map((item, i) => (
+            <div key={i} className="flex items-center gap-2 rounded-lg border border-white/5 bg-zinc-900/50 p-3 transition-colors hover:border-zinc-700">
+              <div className={`h-1 w-1 rounded-full ${accentColor}`} />
+              <span className="text-[11px] font-bold text-zinc-300">{item}</span>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 backdrop-blur-sm p-3 sm:items-center">
       <div className="max-h-[90vh] w-full max-w-2xl flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-zinc-950 shadow-[0_0_50px_rgba(0,0,0,1)] animate-in fade-in zoom-in-95 duration-300">
-        
+
         {/* Header */}
         <div className="flex items-start justify-between border-b border-white/5 bg-zinc-900/40 p-5">
           <div className="flex flex-col gap-1">
@@ -71,56 +80,85 @@ export default function PaymentMethodsModal({ isOpen, onClose }) {
         </div>
 
         <div className="overflow-y-auto p-5 space-y-8 custom-scrollbar">
-          
-          {/* SECTION 1: Installment Partners */}
+
+          {/* SECTION 1: Installment Partners (Sliced inside sub-component) */}
           <div className="space-y-6">
             {isLoading ? (
               <div className="py-10 text-center font-mono text-[10px] text-zinc-700 animate-pulse uppercase tracking-widest">Initializing_Finance_Modules...</div>
             ) : (
               <>
-                <InstallmentGrid 
-                  title={t.payment.companies_title} 
-                  items={installments.companies} 
-                  accentColor="bg-blue-500" 
+                <InstallmentGrid
+                  title={t.payment.companies_title}
+                  items={installments.companies}
+                  accentColor="bg-blue-500"
                 />
-                <InstallmentGrid 
-                  title={t.payment.banks_title} 
-                  items={installments.banks} 
-                  accentColor="bg-emerald-500" 
+                <InstallmentGrid
+                  title={t.payment.banks_title}
+                  items={installments.banks}
+                  accentColor="bg-emerald-500"
                 />
               </>
             )}
           </div>
 
-          {/* SECTION 2: Bank Transfer (Click to Copy) */}
+          {/* SECTION 2: Bank Transfer & InstaPay (Visual Match) */}
           <div className="rounded-xl border border-blue-500/10 bg-blue-500/5 p-4">
             <h3 className="mb-3 font-mono text-[10px] font-black uppercase tracking-widest text-blue-400">
               {t.payment.bank_accounts_title}
             </h3>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {/* NBE Account */}
-              <button 
-                onClick={() => handleCopy("4483172189609200018")}
-                className="flex flex-col text-left rtl:text-right gap-1 rounded-lg bg-black/40 p-3 border border-white/5 hover:bg-black/60 transition-colors group relative"
-              >
-                <span className="font-mono text-[12px] font-bold text-zinc-200 tracking-wider">
-                    {copiedText === "4483172189609200018" ? (isArabic ? "تم النسخ" : "COPIED") : "4483172189609200018"}
-                </span>
-                <span className="text-[10px] text-zinc-500 uppercase">{isArabic ? "البنك الاهلى - فرع شكرى القوتلى" : "NBE - Shoukry Branch"}</span>
-              </button>
 
-              {/* InstaPay */}
-              <button 
-                onClick={() => handleCopy("01098036014")}
-                className="flex items-center justify-between rounded-lg bg-black/40 p-3 border border-white/5 hover:bg-black/60 transition-colors group relative"
-              >
-                <div className="flex flex-col text-left rtl:text-right">
-                  <span className="text-[10px] font-black text-blue-400 uppercase tracking-tighter">{t.payment.instapay_title}</span>
-                  <span className="font-mono text-[11px] text-zinc-200">
-                    {copiedText === "01098036014" ? (isArabic ? "تم النسخ" : "COPIED") : "01098036014 - 01004369876"}
+            <div className="grid gap-3 sm:grid-cols-2">
+
+              {/* NBE Section */}
+              <div className="flex flex-col gap-2 rounded-lg bg-black/40 p-3 border border-white/5 hover:bg-black/50 transition-colors">
+                <span className="text-[10px] font-black text-zinc-500 uppercase tracking-tighter">
+                  {isArabic ? "البنك الاهلى - فرع شكرى القوتلى" : "NBE - Shoukry Branch"}
+                </span>
+
+                <button
+                  onClick={() => handleCopy("4483172189609200018")}
+                  className="group relative flex items-center justify-between rounded-md bg-zinc-900/80 px-2 py-1.5 border border-zinc-800 transition-all hover:border-blue-500/40 active:scale-95"
+                >
+                  <span className="font-mono text-[11px] font-bold text-zinc-200 tracking-wider">
+                    {copiedText === "4483172189609200018" ? (isArabic ? "تم النسخ" : "COPIED") : "4483172189609200018"}
                   </span>
+                  {copiedText !== "4483172189609200018" && (
+                    <svg className="h-3.5 w-3.5 text-zinc-600 group-hover:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+
+              {/* InstaPay Section */}
+              <div className="flex flex-col gap-2 rounded-lg bg-black/40 p-3 border border-white/5 hover:bg-black/50 transition-colors">
+                <span className="text-[10px] font-black text-blue-400 uppercase tracking-tighter">
+                  {t.payment.instapay_title}
+                </span>
+
+                <div className="flex flex-col gap-2">
+                  {["01098036014", "01004369876"].map((num) => (
+                    <button
+                      key={num}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopy(num);
+                      }}
+                      className="group relative flex items-center justify-between rounded-md bg-zinc-900/80 px-2 py-1.5 border border-zinc-800 transition-all hover:border-blue-500/40 active:scale-95"
+                    >
+                      <span className="font-mono text-[11px] text-zinc-200">
+                        {copiedText === num ? (isArabic ? "تم النسخ" : "COPIED") : num}
+                      </span>
+                      {copiedText !== num && (
+                        <svg className="h-3.5 w-3.5 text-zinc-600 group-hover:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
                 </div>
-              </button>
+              </div>
+
             </div>
           </div>
 

@@ -145,7 +145,7 @@ export default function ProductFilters({ products = [], onResultsChange }) {
 
   return (
     <section className="relative overflow-hidden rounded-2xl border border-white/10 bg-black shadow-[0_0_50px_-12px_rgba(59,130,246,0.15)] transition-all duration-500">
-      <div className="absolute top-0 left-0 h-0.5 w-full bg-gradient-to-r from-transparent via-blue-600 to-transparent opacity-50" />
+      <div className="absolute top-0 left-0 h-0.5 w-full bg-linear-to-r from-transparent via-blue-600 to-transparent opacity-50" />
 
       {/* Mobile Toggle Bar */}
       <div className="flex items-center justify-between p-4 lg:hidden">
@@ -167,7 +167,7 @@ export default function ProductFilters({ products = [], onResultsChange }) {
       </div>
 
       {/* Main Content */}
-      <div className={`transition-all duration-500 ease-in-out ${isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0 lg:max-h-[1000px] lg:opacity-100'} overflow-hidden`}>
+      <div className={`transition-all duration-500 ease-in-out ${isExpanded ? 'max-h-250 opacity-100' : 'max-h-0 opacity-0 lg:max-h-250 lg:opacity-100'} overflow-hidden`}>
         <div className="p-6 pt-0 lg:pt-6">
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-6">
             
